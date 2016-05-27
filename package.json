@@ -1,0 +1,25 @@
+{
+  "name": "dcatan-logic",
+  "description": "",
+  "version": "1.0.0",
+  "homepage": "http://github.com/dscores/dcatan-logic",
+  "private": true,
+  "readmeFilename": "README.md",
+  "scripts": {
+    "postinstall": "tsd install",
+    "pretest": "tsc src/*.ts src/**/*.ts test/**/*.ts --module commonjs --outDir dist",
+    "test": "mocha dist/test/**/*.spec.js",
+    "prepublish": "npm run pretest && browserify dist/src/window.js --outfile dist/dcatan-logic.js"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "tsd": "^0.6.5",
+    "typescript": "^1.8.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dscores/dcatan-logic.git"
+  }
+}
