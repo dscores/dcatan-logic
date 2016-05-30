@@ -1,40 +1,153 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var Board = (function () {
-    function Board() {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Object_1 = require('./Object');
+var ClassicBoardLogic_1 = require('./ClassicBoardLogic');
+var ClassicBoard = (function (_super) {
+    __extends(ClassicBoard, _super);
+    function ClassicBoard() {
+        _super.apply(this, arguments);
+    }
+    ClassicBoard.generate = function () {
+        var board = new ClassicBoard();
+        var streetA = board.addStreet();
+        var villageA = board.addVillage(3, streetA);
+        var streetB = board.addStreet(streetA);
+        var streetC = board.addStreet(streetB);
+        var villageB = board.addVillage(4, streetC, villageA);
+        var streetD = board.addStreet(streetC);
+        var streetE = board.addStreet(streetD);
+        var villageC = board.addVillage(5, streetE, villageB);
+        var streetF = board.addStreet(streetE);
+        var streetG = board.addStreet(streetF);
+        var villageD = board.addVillage(7, streetG, villageC);
+        var streetH = board.addStreet(streetG);
+        var streetI = board.addStreet(streetH);
+        var villageE = board.addVillage(9, streetI, villageD);
+        var streetJ = board.addStreet(streetI);
+        var streetK = board.addStreet(streetJ);
+        var villageF = board.addVillage(11, streetK, villageE);
+        var streetBA = board.addStreet(streetB);
+        var cityA = board.addCity(7, streetBA);
+        var streetDA = board.addStreet(streetD);
+        var cityB = board.addCity(12, streetDA, cityA);
+        var streetGA = board.addStreet(streetG);
+        var streetGB = board.addStreet(streetGA);
+        var cityC = board.addCity(20, streetGB, cityB);
+        var streetGC = board.addStreet(streetGB);
+        var streetGD = board.addStreet(streetGC);
+        board.addCity(30, streetGD, cityC);
+        var knightA = board.addKnightAndRessource(1);
+        var knightB = board.addKnightAndRessource(2, knightA);
+        var knightC = board.addKnightAndRessource(3, knightB);
+        var knightD = board.addKnightAndRessource(4, knightC);
+        var knightE = board.addKnightAndRessource(5, knightD);
+        board.addKnightAndRessource(6, knightE);
+        return board;
+    };
+    ClassicBoard.resume = function () {
+        // TODO
+    };
+    ClassicBoard.prototype.addStreet = function (linkedStreet) {
+        if (linkedStreet === void 0) { linkedStreet = undefined; }
+        var street = new Object_1["default"](Object_1.ObjectType.Street);
+        street.setObjectPoints(1);
+        if (linkedStreet) {
+            street.addLinkedObject(linkedStreet);
+        }
+        else {
+            street.markObject();
+        }
+        this.addObject(street);
+        return street;
+    };
+    ClassicBoard.prototype.addVillage = function (points, linkedStreet, linkedVillage) {
+        if (linkedVillage === void 0) { linkedVillage = undefined; }
+        var village = new Object_1["default"](Object_1.ObjectType.Village)
+            .setObjectPoints(points)
+            .addLinkedObject(linkedStreet);
+        if (linkedVillage) {
+            village.addLinkedObject(linkedVillage);
+        }
+        this.addObject(village);
+        return village;
+    };
+    ClassicBoard.prototype.addCity = function (points, linkedStreet, linkedCity) {
+        if (linkedCity === void 0) { linkedCity = undefined; }
+        var city = new Object_1["default"](Object_1.ObjectType.City)
+            .setObjectPoints(points)
+            .addLinkedObject(linkedStreet);
+        if (linkedCity) {
+            city.addLinkedObject(linkedCity);
+        }
+        this.addObject(city);
+        return city;
+    };
+    ClassicBoard.prototype.addKnightAndRessource = function (points, linkedKnight) {
+        if (linkedKnight === void 0) { linkedKnight = undefined; }
+        var knight = new Object_1["default"](Object_1.ObjectType.Knight)
+            .setObjectPoints(points);
+        if (linkedKnight) {
+            knight.addLinkedObject(linkedKnight);
+        }
+        this.addObject(knight);
+        var ressource = new Object_1["default"](Object_1.ObjectType.Ressource)
+            .addLinkedObject(knight);
+        this.addObject(ressource);
+        return knight;
+    };
+    return ClassicBoard;
+}(ClassicBoardLogic_1["default"]));
+exports.__esModule = true;
+exports["default"] = ClassicBoard;
+
+},{"./ClassicBoardLogic":2,"./Object":3}],2:[function(require,module,exports){
+"use strict";
+var ClassicBoardLogic = (function () {
+    function ClassicBoardLogic() {
         this.objects = [];
         this.currentRoundPoints = 0;
         this.roundPoints = [];
     }
-    Board.prototype.setObjects = function (objects) {
-        this.objects = objects;
+    ClassicBoardLogic.prototype.addObject = function (object) {
+        this.objects.push(object);
         return this;
     };
-    Board.prototype.getObjects = function () {
+    ClassicBoardLogic.prototype.getObjects = function () {
         return this.objects;
     };
-    Board.prototype.markObject = function (objectIndex) {
+    ClassicBoardLogic.prototype.isObjectMarkable = function (objectIndex) {
+        if (this.isFinished()) {
+            return false;
+        }
+        return this.getObjects()[objectIndex].isObjectMarkable();
+    };
+    ClassicBoardLogic.prototype.markObject = function (objectIndex) {
         if (this.isFinished()) {
             return this;
         }
         var object = this.getObjects()[objectIndex];
         if (object.markObject()) {
-            this.addCurrentRoundPoints(object.getPoints());
+            this.addCurrentRoundPoints(object.getObjectPoints());
         }
         return this;
     };
-    Board.prototype.addCurrentRoundPoints = function (roundPoints) {
+    ClassicBoardLogic.prototype.addCurrentRoundPoints = function (roundPoints) {
         this.currentRoundPoints += roundPoints;
         return this;
     };
-    Board.prototype.resetCurrentRoundPoints = function () {
+    ClassicBoardLogic.prototype.resetCurrentRoundPoints = function () {
         this.currentRoundPoints = 0;
         return this;
     };
-    Board.prototype.getCurrentRoundPoints = function () {
+    ClassicBoardLogic.prototype.getCurrentRoundPoints = function () {
         return this.currentRoundPoints;
     };
-    Board.prototype.nextRound = function () {
+    ClassicBoardLogic.prototype.nextRound = function () {
         if (this.isFinished()) {
             return;
         }
@@ -47,168 +160,289 @@ var Board = (function () {
             this.resetCurrentRoundPoints();
         }
     };
-    Board.prototype.getRoundPoints = function () {
+    ClassicBoardLogic.prototype.getRoundPoints = function () {
         return this.roundPoints;
     };
-    Board.prototype.getPoints = function () {
+    ClassicBoardLogic.prototype.getPoints = function () {
         return this.getRoundPoints().reduce(function (roundPointsA, roundPointsB) { return roundPointsA + roundPointsB; }, 0);
     };
-    Board.prototype.isOpen = function () {
+    ClassicBoardLogic.prototype.isOpen = function () {
         return this.getRoundPoints().length < 15;
     };
-    Board.prototype.isFinished = function () {
+    ClassicBoardLogic.prototype.isFinished = function () {
         return !this.isOpen();
     };
-    return Board;
+    return ClassicBoardLogic;
 }());
 exports.__esModule = true;
-exports["default"] = Board;
+exports["default"] = ClassicBoardLogic;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
+(function (ObjectType) {
+    ObjectType[ObjectType["Street"] = 1] = "Street";
+    ObjectType[ObjectType["Village"] = 2] = "Village";
+    ObjectType[ObjectType["City"] = 3] = "City";
+    ObjectType[ObjectType["Knight"] = 4] = "Knight";
+    ObjectType[ObjectType["Ressource"] = 5] = "Ressource";
+})(exports.ObjectType || (exports.ObjectType = {}));
+var ObjectType = exports.ObjectType;
 var Object = (function () {
-    function Object(type, links, points) {
+    function Object(type) {
+        this.linkedObjects = [];
         this.marked = false;
+        this.points = 0;
         this.type = type;
-        this.links = links;
-        this.points = points;
     }
-    Object.prototype.getType = function () {
+    Object.prototype.getObjectType = function () {
         return this.type;
     };
-    Object.prototype.getLinks = function () {
-        return this.links;
+    Object.prototype.isObjectStreet = function () {
+        return this.getObjectType() === ObjectType.Street;
     };
-    Object.prototype.isMarkable = function () {
-        if (this.isMarked()) {
+    Object.prototype.isObjectVillage = function () {
+        return this.getObjectType() === ObjectType.Village;
+    };
+    Object.prototype.isObjectCity = function () {
+        return this.getObjectType() === ObjectType.City;
+    };
+    Object.prototype.isObjectKnight = function () {
+        return this.getObjectType() === ObjectType.Knight;
+    };
+    Object.prototype.isObjectRessource = function () {
+        return this.getObjectType() === ObjectType.Ressource;
+    };
+    Object.prototype.addLinkedObject = function (linkedObject) {
+        this.linkedObjects.push(linkedObject);
+        return this;
+    };
+    Object.prototype.getLinkedObjects = function () {
+        return this.linkedObjects;
+    };
+    Object.prototype.isObjectMarkable = function () {
+        if (this.isObjectMarked()) {
             return false;
         }
-        var streets = this.getLinks().filter(function (link) { return link.isStreet(); });
+        var streets = this.getLinkedObjects().filter(function (link) { return link.isObjectStreet(); });
         if (streets.length > 0) {
-            var markedStreets = streets.filter(function (link) { return link.isMarked(); });
-            if (markedStreets.length === 0) {
+            var streetsMarked = streets.filter(function (link) { return link.isObjectMarked(); });
+            if (streetsMarked.length === 0) {
                 return false;
             }
         }
-        var notStreetsNotMarked = this.getLinks().filter(function (link) { return !link.isStreet() && !link.isMarked(); });
+        var notStreetsNotMarked = this.getLinkedObjects().filter(function (link) { return !link.isObjectStreet() && !link.isObjectMarked(); });
         if (notStreetsNotMarked.length > 0) {
             return false;
         }
         return true;
     };
     Object.prototype.markObject = function () {
-        if (!this.isMarkable()) {
+        if (!this.isObjectMarkable()) {
             return false;
         }
         this.marked = true;
         return true;
     };
-    Object.prototype.isMarked = function () {
+    Object.prototype.isObjectMarked = function () {
         return this.marked;
     };
-    Object.prototype.getPoints = function () {
-        return this.points;
+    Object.prototype.setObjectPoints = function (points) {
+        this.points = points;
+        return this;
     };
-    Object.prototype.isStreet = function () {
-        return this.getType() === 'street';
+    Object.prototype.getObjectPoints = function () {
+        return this.points;
     };
     return Object;
 }());
 exports.__esModule = true;
 exports["default"] = Object;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
-var Object_1 = require('../logics/Object');
-function classic(board) {
-    var objects = [];
-    var streetA = new Object_1["default"]('street', [], 1);
-    streetA.markObject();
-    objects.push(streetA);
-    var villageA = new Object_1["default"]('village', [streetA], 3);
-    objects.push(villageA);
-    var streetB = new Object_1["default"]('street', [streetA], 1);
-    objects.push(streetB);
-    var streetBA = new Object_1["default"]('street', [streetB], 1);
-    objects.push(streetBA);
-    var cityA = new Object_1["default"]('city', [streetBA], 7);
-    objects.push(cityA);
-    var streetC = new Object_1["default"]('street', [streetB], 1);
-    objects.push(streetC);
-    var villageB = new Object_1["default"]('village', [streetC, villageA], 4);
-    objects.push(villageB);
-    var anotherStreetCA = new Object_1["default"]('street', [streetC], 1);
-    objects.push(anotherStreetCA);
-    var cityB = new Object_1["default"]('city', [anotherStreetCA, cityA], 12);
-    objects.push(cityB);
-    var streetD = new Object_1["default"]('street', [streetC], 1);
-    objects.push(streetD);
-    var villageC = new Object_1["default"]('village', [streetD, villageB], 5);
-    objects.push(villageC);
-    var streetE = new Object_1["default"]('street', [streetD], 1);
-    objects.push(streetE);
-    var streetF = new Object_1["default"]('street', [streetE], 1);
-    objects.push(streetF);
-    var villageD = new Object_1["default"]('village', [streetF, villageC], 7);
-    objects.push(villageD);
-    var streetFA = new Object_1["default"]('street', [streetF], 1);
-    objects.push(streetFA);
-    var streetFB = new Object_1["default"]('street', [streetFA], 1);
-    objects.push(streetFB);
-    var cityC = new Object_1["default"]('city', [streetFB, cityB], 20);
-    objects.push(cityC);
-    var streetFC = new Object_1["default"]('street', [streetFB], 1);
-    objects.push(streetFC);
-    var streetFD = new Object_1["default"]('street', [streetFC], 1);
-    objects.push(streetFD);
-    var cityD = new Object_1["default"]('city', [streetFD, cityC], 30);
-    objects.push(cityD);
-    var streetG = new Object_1["default"]('street', [streetF], 1);
-    objects.push(streetG);
-    var streetH = new Object_1["default"]('street', [streetG], 1);
-    objects.push(streetH);
-    var villageE = new Object_1["default"]('village', [streetH, villageD], 9);
-    objects.push(villageE);
-    var streetI = new Object_1["default"]('street', [streetH], 1);
-    objects.push(streetI);
-    var streetJ = new Object_1["default"]('street', [streetI], 1);
-    objects.push(streetJ);
-    var villageF = new Object_1["default"]('village', [streetJ, villageE], 11);
-    objects.push(villageF);
-    var knightA = new Object_1["default"]('knight', [], 1);
-    objects.push(knightA);
-    var ressourceA = new Object_1["default"]('ressource', [knightA], 0);
-    objects.push(ressourceA);
-    var knightB = new Object_1["default"]('knight', [knightA], 2);
-    objects.push(knightB);
-    var ressourceB = new Object_1["default"]('ressource', [knightB], 0);
-    objects.push(ressourceB);
-    var knightC = new Object_1["default"]('knight', [knightB], 3);
-    objects.push(knightC);
-    var ressourceC = new Object_1["default"]('ressource', [knightC], 0);
-    objects.push(ressourceC);
-    var knightD = new Object_1["default"]('knight', [knightC], 4);
-    objects.push(knightD);
-    var ressourceD = new Object_1["default"]('ressource', [knightD], 0);
-    objects.push(ressourceD);
-    var knightE = new Object_1["default"]('knight', [knightD], 5);
-    objects.push(knightE);
-    var ressourceE = new Object_1["default"]('ressource', [knightE], 0);
-    objects.push(ressourceE);
-    var knightF = new Object_1["default"]('knight', [knightE], 6);
-    objects.push(knightF);
-    var ressourceF = new Object_1["default"]('ressource', [knightF], 0);
-    objects.push(ressourceF);
-    return board.setObjects(objects);
-}
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Object_1 = require('./Object');
+var PlusBoardLogic_1 = require('./PlusBoardLogic');
+var PlusBoard = (function (_super) {
+    __extends(PlusBoard, _super);
+    function PlusBoard() {
+        _super.apply(this, arguments);
+    }
+    PlusBoard.generate = function () {
+        var board = new PlusBoard();
+        var streetA = board.addStreet();
+        board.addVillage(streetA);
+        var streetB = board.addStreet(streetA);
+        var streetC = board.addStreet(streetB);
+        board.addVillage(streetC);
+        var streetD = board.addStreet(streetC);
+        var streetE = board.addStreet(streetD);
+        board.addVillage(streetE);
+        var streetF = board.addStreet(streetE);
+        var streetG = board.addStreet(streetF);
+        var streetH = board.addStreet(streetG);
+        var streetI = board.addStreet(streetH);
+        board.addVillage(streetI);
+        var streetJ = board.addStreet(streetI);
+        var streetK = board.addStreet(streetJ);
+        board.addVillage(streetK);
+        var streetL = board.addStreet(streetK);
+        var streetM = board.addStreet(streetL);
+        board.addVillage(streetM);
+        var streetN = board.addStreet(streetM);
+        var streetO = board.addStreet(streetN);
+        board.addVillage(streetO);
+        var streetBA = board.addStreet(streetB);
+        board.addCity(streetBA);
+        var streetDA = board.addStreet(streetD);
+        board.addCity(streetDA);
+        board.addCity(streetG);
+        var streetJA = board.addStreet(streetJ);
+        board.addCity(streetJA);
+        board.addKnightsAndRessource(1);
+        board.addKnightsAndRessource(1);
+        board.addKnightsAndRessource(1);
+        board.addKnightsAndRessource(1);
+        board.addKnightsAndRessource(1);
+        board.addKnightsAndRessource(2);
+        board.addKnightsAndRessource(2);
+        return board;
+    };
+    PlusBoard.resume = function () {
+        // TODO
+    };
+    PlusBoard.prototype.addStreet = function (linkedStreet) {
+        if (linkedStreet === void 0) { linkedStreet = undefined; }
+        var street = new Object_1["default"](Object_1.ObjectType.Street);
+        if (linkedStreet) {
+            street.addLinkedObject(linkedStreet);
+        }
+        else {
+            street.markObject();
+        }
+        this.addObject(street);
+        return street;
+    };
+    PlusBoard.prototype.addVillage = function (linkedStreet) {
+        var village = new Object_1["default"](Object_1.ObjectType.Village)
+            .setObjectPoints(1)
+            .addLinkedObject(linkedStreet);
+        this.addObject(village);
+        return this;
+    };
+    PlusBoard.prototype.addCity = function (linkedStreet) {
+        var city = new Object_1["default"](Object_1.ObjectType.City)
+            .setObjectPoints(2)
+            .addLinkedObject(linkedStreet);
+        this.addObject(city);
+        return this;
+    };
+    PlusBoard.prototype.addKnightsAndRessource = function (amountKnights) {
+        var ressource = new Object_1["default"](Object_1.ObjectType.Ressource);
+        for (var i = 0; i < amountKnights; ++i) {
+            var knight = new Object_1["default"](Object_1.ObjectType.Knight);
+            ressource.addLinkedObject(knight);
+            this.addObject(knight);
+        }
+        this.addObject(ressource);
+        return this;
+    };
+    return PlusBoard;
+}(PlusBoardLogic_1["default"]));
 exports.__esModule = true;
-exports["default"] = classic;
+exports["default"] = PlusBoard;
 
-},{"../logics/Object":2}],4:[function(require,module,exports){
+},{"./Object":3,"./PlusBoardLogic":5}],5:[function(require,module,exports){
 "use strict";
-var Board_1 = require('./logics/Board');
-var classic_1 = require('./themes/classic');
-var Dcatan = { Board: Board_1["default"], themes: { classic: classic_1["default"] } };
+var PlusBoardLogic = (function () {
+    function PlusBoardLogic() {
+        this.objects = [];
+        this.mostKnightsMarked = false;
+        this.longestStreetsMarked = false;
+    }
+    PlusBoardLogic.prototype.addObject = function (object) {
+        this.objects.push(object);
+        return this;
+    };
+    PlusBoardLogic.prototype.getObjects = function () {
+        return this.objects;
+    };
+    PlusBoardLogic.prototype.isObjectMarkable = function (objectIndex) {
+        if (this.isFinished()) {
+            return false;
+        }
+        return this.getObjects()[objectIndex].isObjectMarkable();
+    };
+    PlusBoardLogic.prototype.markObject = function (objectIndex) {
+        if (this.isFinished()) {
+            return this;
+        }
+        this.getObjects()[objectIndex].markObject();
+        return this;
+    };
+    PlusBoardLogic.prototype.isMostKnightsChangeable = function () {
+        var knightsMarked = this.getObjects()
+            .filter(function (object) { return object.isObjectKnight() && object.isObjectMarked(); });
+        return knightsMarked.length >= 3;
+    };
+    PlusBoardLogic.prototype.changeMostKnights = function (mostKnightsMarked) {
+        if (!this.isMostKnightsChangeable()) {
+            return this;
+        }
+        this.mostKnightsMarked = mostKnightsMarked;
+        return this;
+    };
+    PlusBoardLogic.prototype.isMostKnightsMarked = function () {
+        return this.mostKnightsMarked;
+    };
+    PlusBoardLogic.prototype.isLongestStreetsChangeable = function () {
+        var streetsMarked = this.getObjects()
+            .filter(function (object) { return object.isObjectStreet() && object.isObjectMarked(); });
+        return streetsMarked.length >= 5;
+    };
+    PlusBoardLogic.prototype.changeLongestStreets = function (longestStreetsMarked) {
+        if (!this.isLongestStreetsChangeable()) {
+            return this;
+        }
+        this.longestStreetsMarked = longestStreetsMarked;
+        return this;
+    };
+    PlusBoardLogic.prototype.isLongestStreetsMarked = function () {
+        return this.longestStreetsMarked;
+    };
+    PlusBoardLogic.prototype.getPoints = function () {
+        var points = this.getObjects()
+            .filter(function (object) { return object.isObjectMarked(); })
+            .map(function (object) { return object.getObjectPoints(); })
+            .reduce(function (objectPointsA, objectPointsB) { return objectPointsA + objectPointsB; }, 0);
+        if (this.isMostKnightsMarked()) {
+            points += 2;
+        }
+        if (this.isLongestStreetsMarked()) {
+            points += 2;
+        }
+        return points;
+    };
+    PlusBoardLogic.prototype.isOpen = function () {
+        return this.getPoints() < 10;
+    };
+    PlusBoardLogic.prototype.isFinished = function () {
+        return !this.isOpen();
+    };
+    return PlusBoardLogic;
+}());
+exports.__esModule = true;
+exports["default"] = PlusBoardLogic;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+var ClassicBoard_1 = require('./logics/ClassicBoard');
+var PlusBoard_1 = require('./logics/PlusBoard');
+var Dcatan = { ClassicBoard: ClassicBoard_1["default"], PlusBoard: PlusBoard_1["default"] };
 window.Dcatan = Dcatan;
 
-},{"./logics/Board":1,"./themes/classic":3}]},{},[4]);
+},{"./logics/ClassicBoard":1,"./logics/PlusBoard":4}]},{},[6]);

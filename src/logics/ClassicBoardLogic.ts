@@ -1,6 +1,6 @@
-import Object, { ObjectType } from './Object';
+import Object from './Object';
 
-export default abstract class ClassicBoardLogic {
+export default class ClassicBoardLogic {
   private objects: Object[] = [];
   private currentRoundPoints: number = 0;
   private roundPoints: number[] = [];

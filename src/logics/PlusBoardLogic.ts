@@ -1,9 +1,9 @@
-import Object, { ObjectType } from './Object';
+import Object from './Object';
 
-export default abstract class PlusBoardLogic {
+export default class PlusBoardLogic {
   private objects: Object[] = [];
-  private currentRoundPoints: number = 0;
-  private roundPoints: number[] = [];
+  private mostKnightsMarked: boolean = false;
+  private longestStreetsMarked: boolean = false;
 
   protected addObject(object: Object): PlusBoardLogic {
     this.objects.push(object);
@@ -29,15 +29,53 @@ export default abstract class PlusBoardLogic {
     return this;
   }
 
+  public isMostKnightsChangeable(): boolean {
+    const knightsMarked = this.getObjects()
+      .filter((object: Object) => { return object.isObjectKnight() && object.isObjectMarked(); });
+    return knightsMarked.length >= 3;
+  }
+
+  public changeMostKnights(mostKnightsMarked: boolean): PlusBoardLogic {
+    if (!this.isMostKnightsChangeable()) {
+      return this;
+    }
+    this.mostKnightsMarked = mostKnightsMarked;
+    return this;
+  }
+
+  public isMostKnightsMarked(): boolean {
+    return this.mostKnightsMarked;
+  }
+
+  public isLongestStreetsChangeable(): boolean {
+    const streetsMarked = this.getObjects()
+      .filter((object: Object) => { return object.isObjectStreet() && object.isObjectMarked(); });
+    return streetsMarked.length >= 5;
+  }
+
+  public changeLongestStreets(longestStreetsMarked: boolean): PlusBoardLogic {
+    if (!this.isLongestStreetsChangeable()) {
+      return this;
+    }
+    this.longestStreetsMarked = longestStreetsMarked;
+    return this;
+  }
+
+  public isLongestStreetsMarked(): boolean {
+    return this.longestStreetsMarked;
+  }
+
   public getPoints(): number {
     let points = this.getObjects()
       .filter((object: Object) => { return object.isObjectMarked(); })
       .map((object: Object) => { return object.getObjectPoints(); })
       .reduce((objectPointsA: number, objectPointsB: number) => { return objectPointsA + objectPointsB; }, 0);
-
-    // TODO längste handelsstraße
-    // TODO größte rittermacht
-
+    if (this.isMostKnightsMarked()) {
+      points += 2;
+    }
+    if (this.isLongestStreetsMarked()) {
+      points += 2;
+    }
     return points;
   }
 

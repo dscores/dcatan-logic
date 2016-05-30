@@ -2,47 +2,62 @@
 /// <reference path='../../typings/mocha/mocha.d.ts' />
 import { expect } from 'chai';
 
-import Object from '../../src/logics/Object';
+import Object, { ObjectType } from '../../src/logics/Object';
 
 describe('[class] Object', () => {
   describe('[method] constructor', () => {
     beforeEach(() => {
-      this.street = new Object('street', [], 1);
+      this.street = new Object(ObjectType.Street);
     });
 
     it('street should be initialized as street with 1 point', () => {
-      expect(this.street.getType()).equal('street');
-      expect(this.street.getPoints()).equal(1);
+      expect(this.street.isObjectStreet()).true;
+      expect(this.street.getObjectPoints()).equal(0);
     });
   });
 
-  describe('[method] isMarkable', () => {
+  describe('[method] isObjectMarkable', () => {
     beforeEach(() => {
-      this.streetA = new Object('street', [], 1);
-      this.streetB = new Object('street', [this.streetA], 1);
-      this.villageA = new Object('village', [this.streetB], 1);
+      this.streetA = new Object(ObjectType.Street)
+        .setObjectPoints(1);
+      this.streetB = new Object(ObjectType.Street)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetA);
+      this.villageA = new Object(ObjectType.Village)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetB);
     });
 
     it('streetA is markable because it does not have a linked street', () => {
-      expect(this.streetA.isMarkable()).true;
+      expect(this.streetA.isObjectMarkable()).true;
     });
 
     it('streetB is not markable because it has a not marked linked street', () => {
-      expect(this.streetB.isMarkable()).false;
+      expect(this.streetB.isObjectMarkable()).false;
     });
 
     it('villageA is not markable because it has a not marked linked street', () => {
-      expect(this.villageA.isMarkable()).false;
+      expect(this.villageA.isObjectMarkable()).false;
     });
   });
 
   describe('[method] markObject', () => {
     beforeEach(() => {
-      this.streetA = new Object('street', [], 1);
-      this.streetB = new Object('street', [this.streetA], 1);
-      this.villageA = new Object('village', [this.streetB], 1);
-      this.streetC = new Object('street', [this.streetB], 1);
-      this.villageB = new Object('village', [this.streetC, this.villageA], 1);
+      this.streetA = new Object(ObjectType.Street)
+        .setObjectPoints(1);
+      this.streetB = new Object(ObjectType.Street)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetA);
+      this.villageA = new Object(ObjectType.Village)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetB);
+      this.streetC = new Object(ObjectType.Street)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetB);
+      this.villageB = new Object(ObjectType.Village)
+        .setObjectPoints(1)
+        .addLinkedObject(this.streetC)
+        .addLinkedObject(this.villageA);
     });
 
     it('streetA returns true after marked', () => {
@@ -51,26 +66,26 @@ describe('[class] Object', () => {
 
     it('streetA can not be marked a second time', () => {
       this.streetA.markObject();
-      expect(this.streetA.isMarkable()).false;
+      expect(this.streetA.isObjectMarkable()).false;
       expect(this.streetA.markObject()).false;
     });
 
     it('streetB is markable after streetA is marked', () => {
       this.streetA.markObject();
-      expect(this.streetB.isMarkable()).true;
+      expect(this.streetB.isObjectMarkable()).true;
     });
 
     it('villageA is markable after streetA and streetB are marked', () => {
       this.streetA.markObject();
       this.streetB.markObject();
-      expect(this.villageA.isMarkable()).true;
+      expect(this.villageA.isObjectMarkable()).true;
     });
 
     it('villageB is not markable if have linked streets because villageA is not marked', () => {
       this.streetA.markObject();
       this.streetB.markObject();
       this.streetC.markObject();
-      expect(this.villageB.isMarkable()).false;
+      expect(this.villageB.isObjectMarkable()).false;
     });
 
     it('villageB is markable if have linked streets because villageA is marked', () => {
@@ -78,7 +93,7 @@ describe('[class] Object', () => {
       this.streetB.markObject();
       this.streetC.markObject();
       this.villageA.markObject();
-      expect(this.villageB.isMarkable()).true;
+      expect(this.villageB.isObjectMarkable()).true;
     });
   });
 });

@@ -6,40 +6,33 @@ export default class ClassicBoard extends ClassicBoardLogic {
     const board = new ClassicBoard();
 
     const streetA = board.addStreet();
-    streetA.markObject();
-
     const villageA = board.addVillage(3, streetA);
     const streetB = board.addStreet(streetA);
+    const streetC = board.addStreet(streetB);
+    const villageB = board.addVillage(4, streetC, villageA);
+    const streetD = board.addStreet(streetC);
+    const streetE = board.addStreet(streetD);
+    const villageC = board.addVillage(5, streetE, villageB);
+    const streetF = board.addStreet(streetE);
+    const streetG = board.addStreet(streetF);
+    const villageD = board.addVillage(7, streetG, villageC);
+    const streetH = board.addStreet(streetG);
+    const streetI = board.addStreet(streetH);
+    const villageE = board.addVillage(9, streetI, villageD);
+    const streetJ = board.addStreet(streetI);
+    const streetK = board.addStreet(streetJ);
+    const villageF = board.addVillage(11, streetK, villageE);
 
     const streetBA = board.addStreet(streetB);
     const cityA = board.addCity(7, streetBA);
-
-    const streetC = board.addStreet(streetB);
-    const villageB = board.addVillage(4, streetC, villageA);
-
-    const streetCA = board.addStreet(streetC);
-    const cityB = board.addCity(12, streetCA, cityA);
-
-    const streetD = board.addStreet(streetC);
-    const villageC = board.addVillage(5, streetD, villageB);
-    const streetE = board.addStreet(streetD);
-    const streetF = board.addStreet(streetE);
-    const villageD = board.addVillage(7, streetF, villageC);
-
-    const streetFA = board.addStreet(streetF);
-    const streetFB = board.addStreet(streetFA);
-    const cityC = board.addCity(20, streetFB, cityB);
-
-    const streetFC = board.addStreet(streetFB);
-    const streetFD = board.addStreet(streetFC);
-    board.addCity(30, streetFD, cityC);
-
-    const streetG = board.addStreet(streetF);
-    const streetH = board.addStreet(streetG);
-    const villageE = board.addVillage(9, streetH, villageD);
-    const streetI = board.addStreet(streetH);
-    const streetJ = board.addStreet(streetI);
-    board.addVillage(11, streetJ, villageE);
+    const streetDA = board.addStreet(streetD);
+    const cityB = board.addCity(12, streetDA, cityA);
+    const streetGA = board.addStreet(streetG);
+    const streetGB = board.addStreet(streetGA);
+    const cityC = board.addCity(20, streetGB, cityB);
+    const streetGC = board.addStreet(streetGB);
+    const streetGD = board.addStreet(streetGC);
+    board.addCity(30, streetGD, cityC);
 
     const knightA = board.addKnightAndRessource(1);
     const knightB = board.addKnightAndRessource(2, knightA);
@@ -60,6 +53,8 @@ export default class ClassicBoard extends ClassicBoardLogic {
     street.setObjectPoints(1);
     if (linkedStreet) {
       street.addLinkedObject(linkedStreet);
+    } else {
+      street.markObject();
     }
     this.addObject(street);
     return street;
