@@ -1,35 +1,66 @@
-export default class Object {
-  private type: string;
-  private links: Object[];
-  private marked: boolean = false;
-  private points: number;
+export enum ObjectType {
+  Street = 1,
+  Village,
+  City,
+  Knight,
+  Ressource
+}
 
-  public constructor(type: string, links: Object[], points: number) {
+export default class Object {
+  private type: ObjectType;
+  private linkedObjects: Object[] = [];
+  private marked: boolean = false;
+  private points: number = 0;
+
+  public constructor(type: ObjectType) {
     this.type = type;
-    this.links = links;
-    this.points = points;
   }
 
-  public getType(): string {
+  private getObjectType(): ObjectType {
     return this.type;
   }
 
-  public getLinks(): Object[] {
-    return this.links;
+  public isObjectStreet(): boolean {
+    return this.getObjectType() === ObjectType.Street;
   }
 
-  public isMarkable(): boolean {
-    if (this.isMarked()) {
+  public isObjectVillage(): boolean {
+    return this.getObjectType() === ObjectType.Village;
+  }
+
+  public isObjectCity(): boolean {
+    return this.getObjectType() === ObjectType.City;
+  }
+
+  public isObjectKnight(): boolean {
+    return this.getObjectType() === ObjectType.Knight;
+  }
+
+  public isObjectRessource(): boolean {
+    return this.getObjectType() === ObjectType.Ressource;
+  }
+
+  public addLinkedObject(linkedObject: Object): Object {
+    this.linkedObjects.push(linkedObject);
+    return this;
+  }
+
+  public getLinkedObjects(): Object[] {
+    return this.linkedObjects;
+  }
+
+  public isObjectMarkable(): boolean {
+    if (this.isObjectMarked()) {
       return false;
     }
-    const streets = this.getLinks().filter((link: Object) => { return link.isStreet(); });
+    const streets = this.getLinkedObjects().filter((link: Object) => { return link.isObjectStreet(); });
     if (streets.length > 0) {
-      const markedStreets = streets.filter((link: Object) => { return link.isMarked(); });
-      if (markedStreets.length === 0) {
+      const streetsMarked = streets.filter((link: Object) => { return link.isObjectMarked(); });
+      if (streetsMarked.length === 0) {
         return false;
       }
     }
-    const notStreetsNotMarked = this.getLinks().filter((link: Object) => { return !link.isStreet() && !link.isMarked(); });
+    const notStreetsNotMarked = this.getLinkedObjects().filter((link: Object) => { return !link.isObjectStreet() && !link.isObjectMarked(); });
     if (notStreetsNotMarked.length > 0) {
       return false;
     }
@@ -37,22 +68,23 @@ export default class Object {
   }
 
   public markObject(): boolean {
-    if (!this.isMarkable()) {
+    if (!this.isObjectMarkable()) {
       return false;
     }
     this.marked = true;
     return true;
   }
 
-  public isMarked(): boolean {
+  public isObjectMarked(): boolean {
     return this.marked;
   }
 
-  public getPoints(): number {
-    return this.points;
+  public setObjectPoints(points: number): Object {
+    this.points = points;
+    return this;
   }
 
-  private isStreet(): boolean {
-    return this.getType() === 'street';
+  public getObjectPoints(): number {
+    return this.points;
   }
 }

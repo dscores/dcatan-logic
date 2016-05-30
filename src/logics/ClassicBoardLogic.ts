@@ -1,12 +1,12 @@
-import Object from './Object';
+import Object, { ObjectType } from './Object';
 
-export default class Board {
+export default abstract class ClassicBoardLogic {
   private objects: Object[] = [];
   private currentRoundPoints: number = 0;
   private roundPoints: number[] = [];
 
-  public setObjects(objects: Object[]): Board {
-    this.objects = objects;
+  protected addObject(object: Object): ClassicBoardLogic {
+    this.objects.push(object);
     return this;
   }
 
@@ -14,23 +14,30 @@ export default class Board {
     return this.objects;
   }
 
-  public markObject(objectIndex: number): Board {
+  public isObjectMarkable(objectIndex: number): boolean {
+    if (this.isFinished()) {
+      return false;
+    }
+    return this.getObjects()[objectIndex].isObjectMarkable();
+  }
+
+  public markObject(objectIndex: number): ClassicBoardLogic {
     if (this.isFinished()) {
       return this;
     }
     const object = this.getObjects()[objectIndex];
     if (object.markObject()) {
-      this.addCurrentRoundPoints(object.getPoints());
+      this.addCurrentRoundPoints(object.getObjectPoints());
     }
     return this;
   }
 
-  public addCurrentRoundPoints(roundPoints: number): Board {
+  private addCurrentRoundPoints(roundPoints: number): ClassicBoardLogic {
     this.currentRoundPoints += roundPoints;
     return this;
   }
 
-  public resetCurrentRoundPoints(): Board {
+  private resetCurrentRoundPoints(): ClassicBoardLogic {
     this.currentRoundPoints = 0;
     return this;
   }

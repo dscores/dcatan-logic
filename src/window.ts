@@ -1,5 +1,4 @@
-import Board from './logics/Board';
-import classic from './themes/classic';
+import ClassicBoard from './logics/ClassicBoard';
 
-let Dcatan = { Board, themes: { classic } };
+let Dcatan = { ClassicBoard };
 (<any>window).Dcatan = Dcatan;
