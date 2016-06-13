@@ -7,9 +7,10 @@
   "readmeFilename": "README.md",
   "scripts": {
     "postinstall": "tsd install",
-    "pretest": "tsc src/*.ts src/**/*.ts test/**/*.ts --module commonjs --outDir dist",
+    "pretest": "npm run transpile",
     "test": "mocha dist/test/**/*.spec.js",
-    "prepublish": "npm run pretest && browserify dist/src/window.js --outfile dist/dcatan-logic.js"
+    "prepublish": "npm run transpile && browserify dist/src/window.js --outfile dist/dqwixx-logic.js",
+    "transpile": "tsc src/*.ts src/**/*.ts test/**/*.ts --module commonjs --outDir dist"
   },
   "devDependencies": {
     "browserify": "^13.0.1",
