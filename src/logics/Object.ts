@@ -54,14 +54,14 @@ export default class Object {
       return false;
     }
     const streets = this.getLinkedObjects().filter((link: Object) => { return link.isObjectStreet(); });
-    if (streets.length > 0) {
+    if (streets.length) {
       const streetsMarked = streets.filter((link: Object) => { return link.isObjectMarked(); });
-      if (streetsMarked.length === 0) {
+      if (!streetsMarked.length) {
         return false;
       }
     }
     const notStreetsNotMarked = this.getLinkedObjects().filter((link: Object) => { return !link.isObjectStreet() && !link.isObjectMarked(); });
-    if (notStreetsNotMarked.length > 0) {
+    if (notStreetsNotMarked.length) {
       return false;
     }
     return true;

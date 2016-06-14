@@ -51,11 +51,11 @@ export default class ClassicBoardLogic {
       return;
     }
     const currentRoundPoints = this.getCurrentRoundPoints();
-    if (currentRoundPoints === 0) {
-      this.roundPoints.push(-2);
-    } else {
+    if (currentRoundPoints) {
       this.roundPoints.push(currentRoundPoints);
       this.resetCurrentRoundPoints();
+    } else {
+      this.roundPoints.push(-2);
     }
   }
 
